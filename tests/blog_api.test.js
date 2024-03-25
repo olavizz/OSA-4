@@ -107,16 +107,29 @@ test('blog without title or url responses with error 400', async () => {
   assert.strictEqual(response.body.length, initialBlogs.length)
 })
 
-test.only('delete succesful', async () => {
+test('delete succesful', async () => {
   console.log(initialBlogs[0]._id)
   await api
     .delete(`/api/blogs/${initialBlogs[0]._id}`)
     .expect(204)
   
   const response = await api.get('/api/blogs')
-  
   assert.strictEqual(response.body.length, initialBlogs.length-1)
 
+})
+
+test('updating succesful', async () => {
+  const updatedLikes = {
+    likes: 1000
+  }
+  await api
+    .put(`/api/blogs/${initialBlogs[0]._id}`)
+    .send(updatedLikes)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs/')
+  assert.deepStrictEqual(response.body[0].likes, updatedLikes.likes)
 })
 
 after(async () => {
