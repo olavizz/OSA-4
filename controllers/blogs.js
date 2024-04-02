@@ -2,6 +2,8 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog
@@ -14,8 +16,12 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
   try {
     const body = request.body
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid'})
+    }
 
-    const user = await User.findById(body.userId)
+    const user = await User.findById(decodedToken.id)
 
     const blog = new Blog({
         title: body.title,
@@ -35,12 +41,33 @@ blogsRouter.post('/', async (request, response) => {
       }
 })
 
-blogsRouter.delete('/:id', (request, response) => {
-  Blog.findByIdAndDelete(request.params.id)
-    .then(result => {
-      response.status(204).end()
-    })
-})
+blogsRouter.delete('/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  try {
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  console.log(decodedToken.id)
+  if (!decodedToken.id) {
+    return response.status(401).json({error: 'token invalid'})
+  }
+  console.log(decodedToken)
+  console.log(decodedToken.id)
+  const user = await User.findById(decodedToken.id)
+  console.log(user._id)
+  console.log(blog)
+
+
+
+  if (blog.user.toString() !== user._id.toString()) {
+    return response.status(400).json({error: 'blog and user dont match'})
+  }
+  await Blog.findOneAndDelete(blog._id)
+  response.status(204).json({message: 'delete succesful'})
+
+  }
+ catch(error) {
+  console.log(error)
+  response.status(400).json(error)
+} })
 
 blogsRouter.put('/:id', (request, response) => {
   const body = request.body

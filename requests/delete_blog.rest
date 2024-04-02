@@ -1,10 +1,2 @@
-POST http://localhost:3003/api/blogs HTTP/1.1
-content-type: application/json
+DELETE http://localhost:3003/api/blogs/660c4c9911de846722a5265d
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImludGlhYW5pIiwiaWQiOiI2NjBjMzg1Y2EwZmQyYTE2ZDQwMzAyMDgiLCJpYXQiOjE3MTIwODEyMDd9.__4ikh5pBBj837DcRxfogUvzwmZ-2hwl4-auMQcXQCY
-
-{
-    "title": "Greatest Blog Ever",
-    "author": "GG",
-    "url": "http://GOAT",
-    "likes": 999
-}
